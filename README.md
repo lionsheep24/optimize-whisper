@@ -1,3 +1,1 @@
 # optimize-whisper
-
-#test

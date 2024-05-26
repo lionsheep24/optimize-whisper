@@ -1,0 +1,19 @@
+# Use an official NVIDIA PyTorch image as a parent image
+FROM nvcr.io/nvidia/pytorch:23.10-py3
+
+# Set a working directory
+WORKDIR /workspace
+
+# Install necessary packages and dependencies for Triton Server
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        wget \
+        software-properties-common \
+        autoconf \
+        automake \
+        libtool \
+        pkg-config \
+        libcurl4-openssl-dev \
+        libb64-dev && \
+    rm -rf /var/lib/apt/lists/*
+COPY task /workspace/task
+RUN pip install -r /workspace/task/pytriton/requirements.txt

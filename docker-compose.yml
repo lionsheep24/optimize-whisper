@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  tensorrt-llm-compilier:
+    image: whisper-tensorrt-llm:0.0.0
+    working_dir: /workspace/TensorRT-LLM/examples/whisper
+    volumes:
+      - ./models:/workspace/models
+    command: >
+      bash -c "python3 build.py --model_dir /workspace/models/whisper-large-v2-openai --model_name large-v2 --dtype float16 --max_batch_size 16 --output_dir /workspace/models/whisper-large-v2-tensorrt-llm --use_gpt_attention_plugin float16 --use_gemm_plugin float16 --use_bert_attention_plugin float16 --enable_context_fmha"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+  # pytritonserver:
+  #   image: nvcr.io/nvidia/pytorch:23.10-py3
+  #   container_name: pytritonserver
+  #   ports:
+  #     - "8000:8000" # HTTP 서비스 포트
+  #     - "8001:8001" # gRPC 서비스 포트
+  #     - "8002:8002" # 메트릭스 서비스 포트
+  #   volumes:
+  #     - C:\Users\user\Documents\.cache:/models # 호스트의 './models' 디렉토리를 컨테이너의 '/models' 디렉토리에 마운트
+  #   command: 
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           capabilities: [gpu]
