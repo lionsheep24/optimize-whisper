@@ -1,30 +1,35 @@
-# for building tensorrt-llm
+# Use the NVIDIA CUDA image with development tools and Ubuntu 22.04
 FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
-
+#FROM nvcr.io/nvidia/cuda:12.1.0-devel-ubuntu22.04
+# Set the working directory
 WORKDIR /workspace
 
+# Environment variables for MPI
 ENV MPI_HOME=/usr/local/mpi
 ENV PATH="$MPI_HOME/bin:$PATH"
 ENV LD_LIBRARY_PATH="$MPI_HOME/lib:$LD_LIBRARY_PATH"
 
+# Install necessary packages
+RUN apt-get update && apt-get -y install python3.10 python3-pip openmpi-bin libopenmpi-dev git git-lfs
 
-RUN apt-get update && apt-get -y install python3.10 python3-pip openmpi-bin libopenmpi-dev git
+# Inform Git about the CA bundle for certificate verification
+#RUN git config --global http.sslCAInfo /opt/conda/lib/python3.10/site-packages/certifi/cacert.pem
 
+# Upgrade pip and install necessary Python packages
 RUN pip install --upgrade pip setuptools wheel
-RUN pip install tensorrt_llm -U --pre --extra-index-url https://pypi.nvidia.com
-RUN git clone https://github.com/NVIDIA/TensorRT-LLM.git /workspace/TensorRT-LLM
+
+# Clone the TensorRT-LLM repository
+RUN git clone https://github.com/NVIDIA/TensorRT-LLM.git /workspace/TensorRT-LLM && \
+    cd /workspace/TensorRT-LLM && \
+    git checkout b777bd6
 WORKDIR /workspace/TensorRT-LLM
-RUN pip install -r examples/whisper/requirements.txt
+#RUN pip install -r examples/whisper/requirements.txt
 
-RUN apt-get update && \
-    apt-get install -y git-lfs && \
-    git lfs install
+RUN pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com tensorrt-llm==0.11.0.dev2024060400 tiktoken datasets kaldialign openai-whisper librosa soundfile safetensors transformers janus
 
+# Setup Git LFS
+RUN git lfs install
 
-WORKDIR /workspace
-
-COPY models /workspace/models
-COPY assets /workspace/TensorRT-LLM/examples/whisper/assets
-
-
-# For triton
+COPY models/whisper-large-v2-hf /workspace/models/whisper-large-v2
+COPY ./utils/convert_hf_to_openai.py /workspace/TensorRT-LLM/examples/whisper
+COPY ./assets /workspace/TensorRT-LLM/examples/whisper/assets

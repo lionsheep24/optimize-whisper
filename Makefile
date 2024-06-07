@@ -7,7 +7,9 @@ VERSION := 0.0.0
 
 # Docker image name
 PYTRITON_IMAGE_NAME := whisper-pytriton
-TENSORRT_LLM_IMAGE_NAME := whisper-tensorrt-llm
+TENSORRT_LLM_COMPILER_IMAGE_NAME := whisper-tensorrt-llm-compiler
+TENSORRT_LLM_TRITONSERVER_IMAGE_NAME := whisper-tensorrt-llm-tritonserver
+
 # Build the Docker image
 .PHONY: build-pytriton
 build-pytriton:
@@ -15,10 +17,15 @@ build-pytriton:
 	docker build -f Dockerfile.pytriton -t $(PYTRITON_IMAGE_NAME):$(VERSION) .
 
 
-.PHONY: build-tensorrt-llm
-build-tensorrt-llm:
+.PHONY:
+build-tensorrt-llm-compiler:
 	@echo "Building the PyTriton Docker image..."
-	docker build -f Dockerfile.tensorrt_llm -t $(TENSORRT_LLM_IMAGE_NAME):$(VERSION) .
+	docker build -f Dockerfile.tensorrt_llm -t $(TENSORRT_LLM_COMPILER_IMAGE_NAME):$(VERSION) .
+
+.PHONY: build-tensorrt-llm-tritonserver
+build-tensorrt-llm-tritonserver:
+	@echo "Building the PyTriton Docker image..."
+	docker build -f Dockerfile.tritonserver -t $(TENSORRT_LLM_TRITONSERVER_IMAGE_NAME):$(VERSION) .
 
 # Help target to display help to the user
 .PHONY: help

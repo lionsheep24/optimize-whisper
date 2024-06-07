@@ -1,0 +1,17 @@
+FROM nvcr.io/nvidia/tritonserver:24.03-py3
+
+RUN apt update && apt-get install -y ffmpeg
+RUN python3 -m pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com tensorrt-llm==0.11.0.dev2024060400
+RUN python3 -m pip install mpmath==1.3.0 gradio==3.50.2 tritonclient[all]
+
+COPY triton/requirements.txt /workspace/requirements.txt
+WORKDIR /workspace
+RUN python3 -m pip install -r requirements.txt
+
+# COPY model
+COPY ./models/whisper-large-v2-tensorrt-llm /workspace/models/whisper-large-v2-tensorrt-llm/1/whisper-large-v2
+COpY ./assets /workspace/models/whisper-large-v2-tensorrt-llm/1
+# COPY src
+COPY ./triton/server /workspace/models/whisper-large-v2-tensorrt-llm/1
+COPY ./triton/config.pbtxt /workspace/models/whisper-large-v2-tensorrt-llm
+COPY ./triton/launch_server.sh /workspace/launch_server.sh
