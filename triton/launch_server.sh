@@ -1,5 +1,5 @@
+#!/bin/bash
 export CUDA_VISIBLE_DEVICES="0"
-
 model_repo_path=/workspace/models
 
 tritonserver --model-repository $model_repo_path \

@@ -30,6 +30,7 @@ class TritonPythonModel:
           * model_version: Model version
           * model_name: Model name
         """
+        self.logger = pb_utils.Logger
         self.model_config = model_config = json.loads(args['model_config'])
 
         # Get OUTPUT0 configuration
@@ -104,7 +105,7 @@ class TritonPythonModel:
         # convert prompt_ids to tensor, tensor shape is [Batch, Seq], left padding with self.blank
         tokens = torch.nn.utils.rnn.pad_sequence(prompt_ids, batch_first=True, padding_value=self.blank)
         tokens = tokens.to(features.device)
-        print(features.shape)
+        self.logger.log_info(str(features.shape))
         output_ids = self.model.process_batch(features, tokens)
 
         results = [output_ids[i][0] for i in range(len(output_ids))]
@@ -124,4 +125,4 @@ class TritonPythonModel:
         Implementing `finalize` function is optional. This function allows
         the model to perform any necessary clean ups before exit.
         """
-        print('Cleaning up...')
+        self.logger.log_info('Cleaning up...')

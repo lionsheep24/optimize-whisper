@@ -18,13 +18,14 @@ from pathlib import Path
 
 import numpy as np
 import torch
-
+import triton_python_backend_utils as pb_utils
 import tensorrt_llm
 import tensorrt_llm.logger as logger
 from tensorrt_llm._utils import (str_dtype_to_torch, str_dtype_to_trt,
                                  trt_dtype_to_torch)
 from tensorrt_llm.runtime import ModelConfig, SamplingConfig
 from tensorrt_llm.runtime.session import Session, TensorInfo
+
 
 
 class WhisperEncoding:

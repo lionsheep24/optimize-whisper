@@ -347,7 +347,7 @@ async def send_whisper(
         samples[0, : len(waveform)] = waveform
 
         lengths = np.array([[len(waveform)]], dtype=np.int32)
-
+        print(samples.shape)
         inputs = [
             protocol_client.InferInput(
                 "WAV", samples.shape, np_to_triton_dtype(samples.dtype)
@@ -408,9 +408,8 @@ async def main():
                 "text": "foo",
                 "id": 0,
             }
-        ]
-    ]
-
+        ] 
+    ] * args.num_tasks
     url = f"{args.server_addr}:{args.server_port}"
 
     triton_client = grpcclient.InferenceServerClient(url=url, verbose=False)
@@ -437,8 +436,6 @@ async def main():
     tasks = []
     start_time = time.time()
     for i in range(args.num_tasks):
-        
-  
         task = asyncio.create_task(
             send_whisper(
                 dps=dps_list[i],
